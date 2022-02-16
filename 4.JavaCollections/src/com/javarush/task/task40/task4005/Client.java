@@ -1,9 +1,7 @@
 package com.javarush.task.task40.task4005;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.ServerSocket;
 import java.net.Socket;
 
 /* 
@@ -42,17 +40,16 @@ public class Client {
         }
     }
 
+    public static void main(String[] args) {
+        Client client = new Client();
+        client.run();
+    }
+
     public class SocketThread extends Thread {
-        ServerSocket ss = new ServerSocket(4444);
-
-        public SocketThread() throws IOException {
-        }
-
         @Override
         public void run() {
             try {
                 while (true) {
-                    Socket socket = ss.accept();
                     String message = connection.receive();
                     System.out.println(message);
                 }
@@ -63,9 +60,5 @@ public class Client {
         }
     }
 
-    public static void main(String[] args) {
-        Client client = new Client();
-        client.run();
-    }
 
 }
