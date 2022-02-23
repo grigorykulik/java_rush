@@ -50,4 +50,6 @@ public class Beach implements Comparable<Beach> {
         System.out.println(b1.compareTo(b2));
     }
 
+
+
 }

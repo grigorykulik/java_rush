@@ -10,33 +10,46 @@ import java.util.*;
 public class Solution {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        String input;
-        List<Integer> fileNumbers = new ArrayList<>();
-
+        String input = "";
+        Map<String, Integer> fileNameToNumber = new HashMap<>();
+        final String fileName;
 
         input = scanner.nextLine();
         if (input.equals("end")) return;
 
-        final String fileName = input.replaceFirst("\\.part[0-9]+$", "");
+        fileName = getFileName(input);
+        int partNumber = getPartNumber(input);
+        fileNameToNumber.put(input, partNumber);
 
-        fileNumbers.add(getPartNumber(input));
+        do {
+            input = scanner.nextLine();
+            if (input.equals("end")) break;
+            partNumber = getPartNumber(input);
+            fileNameToNumber.put(input, partNumber);
+        } while (true);
 
-        for (input = scanner.nextLine(); !input.equals("end"); input = scanner.nextLine()) {
-            fileNumbers.add(getPartNumber(input));
-        }
 
-        fileNumbers.stream()
-                .sorted()
-                .forEach(fileNumber -> {
-                    try (BufferedInputStream fis = new BufferedInputStream(new FileInputStream(fileName + ".part" + fileNumber));
-                         BufferedOutputStream fos = new BufferedOutputStream(new FileOutputStream(fileName, true))) {
-                        for (int b = fis.read(); b != -1; b = fis.read()) {
-                            fos.write(b);
+
+        fileNameToNumber.entrySet()
+                .stream()
+                .sorted(Map.Entry.comparingByValue())
+                .forEach(pair -> {
+                    try (FileInputStream fis = new FileInputStream(pair.getKey());
+                    FileOutputStream fos = new FileOutputStream(fileName, true)) {
+                        byte[] bytes = new byte[10];
+
+                        while (fis.available() > 0) {
+                            int count = fis.read(bytes);
+                            fos.write(bytes, 0, count);
                         }
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
                     } catch (IOException e) {
-                        throw new RuntimeException(e);
+                        e.printStackTrace();
                     }
                 });
+
+
     }
 
     public static int getPartNumber(String input) {
@@ -45,5 +58,19 @@ public class Solution {
         String partNumberString = partInfo.substring(4);
         int partNumber = Integer.parseInt(partNumberString);
         return partNumber;
+    }
+
+    public static String getFileName(String input) {
+        String[] fileInfo = input.split("\\.");
+        StringBuilder sb = new StringBuilder();
+
+        for (int i = 0; i < fileInfo.length - 1; i++) {
+            sb.append(fileInfo[i]);
+            if (i != fileInfo.length - 2) {
+                sb.append(".");
+            }
+        }
+
+        return sb.toString();
     }
 }

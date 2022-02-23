@@ -22,6 +22,7 @@ public class Solution {
 
             while ((currentLine = fileReader.readLine()) != null) {
                 String[] productInfo = currentLine.split(" ");
+
                 if (productInfo[0].equals(id)) {
                     System.out.println(currentLine);
                 }

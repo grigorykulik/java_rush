@@ -1,11 +1,9 @@
 package com.javarush.task.task18.task1803;
 
+import java.io.BufferedReader;
 import java.io.FileInputStream;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Scanner;
-import java.util.stream.Collectors;
+import java.io.InputStreamReader;
+import java.util.*;
 
 /* 
 Самые частые байты
@@ -13,38 +11,37 @@ import java.util.stream.Collectors;
 
 public class Solution {
     public static void main(String[] args) throws Exception {
-        Scanner scanner = new Scanner(System.in);
-        String filename = scanner.nextLine();
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String filename = br.readLine();
+        Map<Integer, Integer> map = new HashMap<>();
+        FileInputStream fis = new FileInputStream(filename);
 
-        Map<Integer, Integer> byteToFrequency = new HashMap<>();
-
-        try (FileInputStream fis = new FileInputStream(filename)) {
-            while (fis.available() > 0) byteToFrequency.compute(fis.read(), (k, v) -> (v != null ? v : 0) + 1);
+        while (fis.available() > 0) {
+            int currentByte = fis.read();
+            if (!map.containsKey(currentByte)) {
+                map.put(currentByte, 1);
+            } else {
+                int counter = map.get(currentByte);
+                counter++;
+                map.put(currentByte, counter);
+            }
         }
 
-        int maxFrequency = byteToFrequency.values()
-                .stream()
-                .mapToInt(v -> v)
-                .max()
-                .orElseThrow(NoSuchElementException::new);
+        fis.close();
 
-        byteToFrequency.entrySet()
+        int maxCount = map.values()
+                        .stream()
+                                .mapToInt(v -> v)
+                                        .max()
+                                                .orElseThrow(NoSuchElementException::new);
+
+        map.entrySet()
                 .stream()
                 .sorted(Map.Entry.comparingByKey())
                 .forEach(pair -> {
-                    if (pair.getValue() == maxFrequency) {
+                    if (pair.getValue() == maxCount) {
                         System.out.print(pair.getKey() + " ");
                     }
                 });
-
-        // Version 2
-        System.out.println(byteToFrequency
-                .entrySet()
-                .stream()
-                .filter(e -> e.getValue() == maxFrequency)
-                .map(Map.Entry::getKey)
-                .sorted()
-                .map(Object::toString)
-                .collect(Collectors.joining(" ")));
     }
 }
